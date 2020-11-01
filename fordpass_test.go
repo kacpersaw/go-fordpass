@@ -7,14 +7,18 @@ import (
 	"testing"
 )
 
-func TestClient_Authenticate(t *testing.T) {
+func TestClient_Status(t *testing.T) {
 	c := NewClient(
 		os.Getenv("FORDPASS_USERNAME"),
 		os.Getenv("FORDPASS_PASSWORD"),
-		os.Getenv("VIN"))
+		os.Getenv("FORDPASS_VIN"))
 
-	err := c.Authenticate()
+	status, err := c.Status()
 	if err != nil {
-		t.Error(err)
+		t.Errorf("TestClient_Status() Error %v", err.Error())
+	}
+
+	if status.Vin != c.Vin {
+		t.Errorf("TestClient_Status() got: %s want: %s", status.Vin, c.Vin)
 	}
 }

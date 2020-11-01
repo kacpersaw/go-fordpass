@@ -17,12 +17,12 @@ const (
 type Client struct {
 	BaseURL string
 
-	username string
-	password string
-	vin      string
+	Username string
+	Password string
+	Vin      string
 
-	token     string
-	expiresAt time.Time
+	Token     string
+	ExpiresAt time.Time
 
 	client *http.Client
 }
@@ -31,9 +31,9 @@ func NewClient(username, password, vin string) *Client {
 	return &Client{
 		BaseURL: defaultBaseURL,
 
-		username: username,
-		password: password,
-		vin:      vin,
+		Username: username,
+		Password: password,
+		Vin:      vin,
 
 		client: &http.Client{
 			Timeout: time.Minute,
@@ -49,12 +49,12 @@ type AuthResponse struct {
 	ExpiresIn    int    `json:"expires_in"`
 }
 
-func (c *Client) Authenticate() error {
+func (c *Client) auth() error {
 	data := url.Values{}
 	data.Set("client_id", "9fb503e0-715b-47e8-adfd-ad4b7770f73b")
 	data.Set("grant_type", "password")
-	data.Set("username", c.username)
-	data.Set("password", c.password)
+	data.Set("username", c.Username)
+	data.Set("password", c.Password)
 
 	req, err := http.NewRequest("POST", defaultAuthURL, strings.NewReader(data.Encode()))
 	if err != nil {
@@ -68,17 +68,31 @@ func (c *Client) Authenticate() error {
 		return err
 	}
 
-	c.token = res.AccessToken
+	c.Token = res.AccessToken
 
 	t := time.Now()
 	t.Add(time.Duration(res.ExpiresIn) * time.Second)
-	c.expiresAt = t
+	c.ExpiresAt = t
+
+	return nil
+}
+
+func (c *Client) acquireToken() error {
+	if c.Token == "" || time.Now().After(c.ExpiresAt) {
+		return c.auth()
+	}
 
 	return nil
 }
 
 func (c *Client) doRequest(req *http.Request, v interface{}) error {
 	setHeaders(req)
+
+	//set auth token header if set
+	if c.Token != "" {
+		req.Header.Set("auth-token", c.Token)
+	}
+
 	res, err := c.client.Do(req)
 	if err != nil {
 		return err
