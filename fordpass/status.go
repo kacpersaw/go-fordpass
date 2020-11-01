@@ -369,7 +369,7 @@ func (c *Client) Status() (*VehicleStatus, error) {
 		return nil, err
 	}
 
-	req, err := http.NewRequest("GET", fmt.Sprintf("%s/vehicles/v4/%s/status", defaultBaseURL, c.Vin), nil)
+	req, err := http.NewRequest("GET", fmt.Sprintf("%s/vehicles/v4/%s/status", baseURL, c.Vin), nil)
 	if err != nil {
 		return nil, err
 	}

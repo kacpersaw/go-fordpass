@@ -2,18 +2,13 @@
 
 package fordpass
 
-import (
-	"os"
-	"testing"
-)
-
 func TestClient_Status(t *testing.T) {
-	c := NewClient(
+	car := NewClient(
 		os.Getenv("FORDPASS_USERNAME"),
 		os.Getenv("FORDPASS_PASSWORD"),
 		os.Getenv("FORDPASS_VIN"))
 
-	status, err := c.Status()
+	status, err := car.Status()
 	if err != nil {
 		t.Errorf("TestClient_Status() Error %v", err.Error())
 	}
