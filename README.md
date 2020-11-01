@@ -9,7 +9,7 @@ Project based on [fordpass-python](https://github.com/clarkd/fordpass-python)
 package main
 
 import (
-	"github.com/kacpersaw/go-fordpass"
+	"github.com/kacpersaw/go-fordpass/fordpass"
 	"log"
 	"os"
 )
